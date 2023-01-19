@@ -501,13 +501,13 @@ def main():
             pcaW2a_Data=doorB.output(J17.pin6,1,pcaW2a_Data)
         if time3 !=0 :
             time.sleep(iocontrolsleep)
-            pcaW11_Data=doorB.output(J34.pin7,0,pcaW11_Data)
+            pcaW2a_Data=doorB.output(J17.pin8,0,pcaW2a_Data)
             time.sleep(iocontrolsleep)
-            pcaW15_Data=pump1.output(J34.pin7,0,pcaW15_Data)
+            pcaW28_Data=pump1.output(J17.pin8,0,pcaW28_Data)
             time.sleep(time3)
-            pcaW15_Data=pump1.output(J34.pin7,1,pcaW15_Data)
+            pcaW28_Data=pump1.output(J17.pin8,1,pcaW28_Data)
             time.sleep(iocontrolsleep)
-            pcaW11_Data=doorB.output(J34.pin7,1,pcaW11_Data)
+            pcaW2a_Data=doorB.output(J17.pin8,1,pcaW2a_Data)
         if time4 !=0 :
             time.sleep(iocontrolsleep)
             pcaW2a_Data=doorB.output(J34.pin2,0,pcaW2a_Data)

@@ -3,7 +3,7 @@ import multiprocessing as mp
 import serial
 from time import sleep
 import time
-from jsonrpcserver import method,serve
+from jsonrpcserver import method,serve,Success
 import Adafruit_GPIO as GPIO
 import pigpio
 import os
@@ -2065,11 +2065,12 @@ def jsonrpcserver(q):
         print(orderobj.content)
         for cup in orderobj.content:
             ss = cup.to_dict()
-            # ss=json.dumps(cup)
+            #ss=json.dumps(cup)
             cupOrder=pay_pay_cup_order_from_dict(ss)
-            print('put')
+            print('=== put ===')
             q.put(cup)
-            print('put ok')
+            print('=== put ok ===')
+        return Success("get order")
             
     serve(port=9000)
 
