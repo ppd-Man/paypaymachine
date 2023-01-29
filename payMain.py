@@ -211,7 +211,7 @@ def AutoClean(modenum):
     pcaW2c_Data=pcaW2c.output(J34.pin7,0,pcaW2c_Data) 
     time.sleep(0.5)
     pcaW28_Data=pcaW28.output(J34.pin7,0,pcaW28_Data)
-    time.sleep(6)
+    time.sleep(8)
     pcaW28_Data=pcaW28.output(J34.pin7,1,pcaW28_Data)
     time.sleep(0.5)
     pcaW2c_Data=pcaW2c.output(J34.pin7,1,pcaW2c_Data)
@@ -226,7 +226,7 @@ def AutoClean(modenum):
     pcaW2a_Data=pcaW2a.output(J34.pin7,1,pcaW2a_Data)
     time.sleep(1)
     ##==============================================
-    if hour_time_int >= 1 and hour_time_int < 9:
+    if hour_time_int >= 1 and hour_time_int <= 9: ##設定休息沖茶總清時間
         print('== 時間範圍內不沖茶 ==')        
         pcaW21.output(PCA9535J33.pin6,LOW) ### 沖茶機No1 CleanMode Enable###
         time.sleep(1)
@@ -248,6 +248,10 @@ def AutoClean(modenum):
         time.sleep(1)
         pcaW21.output(PCA9535J33.pin10,HIGH) ### 沖茶機No3 CleanMode Close###
         CleanMode = 0
+        if LastCleanMode_Open == 1:
+            while True:
+                time.sleep(2000)
+                print('== 最後準備營運等待人員重新啟動 ==')
         ##print('== 時間範圍內不清茶 ==')
         ##f = open("/home/pi/paypaymachine/sysArunstate.txt", 'w')
         ##f.write('NoRun')
@@ -267,10 +271,7 @@ def AutoClean(modenum):
     if CleanMode:  ##CleanMode, 清空茶桶
         print('== 總清排 AS4-1 ==')
         time.sleep(40)
-    if LastCleanMode_Open:
-        print('== 最後清桶準備營運 AS4-1 ==')
-        time.sleep(40)
-    time.sleep(10)
+    time.sleep(12)
     pcaW28_Data=pcaW28.output(J34.pin4,1,pcaW28_Data)
     time.sleep(0.5)
     pcaW2c_Data=pcaW2c.output(J34.pin4,1,pcaW2c_Data)
@@ -281,9 +282,6 @@ def AutoClean(modenum):
     pcaW28_Data=pcaW28.output(J34.pin4,0,pcaW28_Data)
     if CleanMode: ##CleanMode, 清空茶桶
         print('== 總清排 BS4-1 ==')
-        time.sleep(40)
-    if LastCleanMode_Open:
-        print('== 最後清桶準備營運 BS4-1 ==')
         time.sleep(40)
     time.sleep(4)
     pcaW28_Data=pcaW28.output(J34.pin4,1,pcaW28_Data)
@@ -299,9 +297,6 @@ def AutoClean(modenum):
     if CleanMode: ##CleanMode, 清空茶桶
         print('== 總清排 AS4-4 ==')
         time.sleep(40)
-    if LastCleanMode_Open:
-        print('== 最後清桶準備營運 AS4-4 ==')
-        time.sleep(40)
     time.sleep(10)
     pcaW28_Data=pcaW28.output(J34.pin2,1,pcaW28_Data)
     time.sleep(0.5)
@@ -313,9 +308,6 @@ def AutoClean(modenum):
     pcaW28_Data=pcaW28.output(J34.pin2,0,pcaW28_Data)
     if CleanMode: ##CleanMode, 清空茶桶
         print('== 總清排 BS4-4 ==')
-        time.sleep(40)
-    if LastCleanMode_Open:
-        print('== 最後清桶準備營運 BS4-4 ==')
         time.sleep(40)
     time.sleep(4)
     pcaW28_Data=pcaW28.output(J34.pin2,1,pcaW28_Data)
@@ -330,10 +322,6 @@ def AutoClean(modenum):
     if CleanMode: ##CleanMode, 清空茶桶
         print('== 總清排 AS5-3 ==')
         time.sleep(40)
-    if LastCleanMode_Open:
-        print('== 最後清桶準備營運 AS5-3 ==')
-        time.sleep(40)
-    time.sleep(10)
     pcaW28_Data=pcaW28.output(J34.pin6,1,pcaW28_Data)
     time.sleep(0.5)
     pcaW2c_Data=pcaW2c.output(J34.pin6,1,pcaW2c_Data)
@@ -344,9 +332,6 @@ def AutoClean(modenum):
     pcaW28_Data=pcaW28.output(J34.pin6,0,pcaW28_Data)
     if CleanMode: ##CleanMode, 清空茶桶
         print('== 總清排 BS5-3 ==')
-        time.sleep(40)
-    if LastCleanMode_Open:
-        print('== 最後清桶準備營運 BS5-3 ==')
         time.sleep(40)
     time.sleep(4)
     pcaW28_Data=pcaW28.output(J34.pin6,1,pcaW28_Data)
@@ -361,7 +346,7 @@ def AutoClean(modenum):
     if CleanMode: ##CleanMode, 清空茶桶
         print('== 總清排 AS5-4 ==')
         time.sleep(1)
-    time.sleep(3)
+    time.sleep(14)
     pcaW28_Data=pcaW28.output(J33.pin8,1,pcaW28_Data)
     time.sleep(0.5)
     pcaW2c_Data=pcaW2c.output(J33.pin8,1,pcaW2c_Data)
@@ -373,7 +358,7 @@ def AutoClean(modenum):
     if CleanMode: ##CleanMode, 清空茶桶
         print('== 總清排 BS5-4 ==')
         time.sleep(1)
-    time.sleep(3)
+    time.sleep(6)
     pcaW28_Data=pcaW28.output(J33.pin8,1,pcaW28_Data)
     time.sleep(0.5)
     pcaW2a_Data=pcaW2a.output(J33.pin8,1,pcaW2a_Data)
@@ -488,12 +473,13 @@ def StationA_S0(track,opentimeStr):
         time.sleep(1)
         
         if opentime > 0:
+            pcaW21.output(PCA9535J33.pin2,LOW) ### 冰塊推桿到B(升起) ### 防卡冰?
             pcaW21.output(PCA9535J33.pin4,LOW) ###給冰電磁閥開啟###
             for i in range(opentime): #Evan 點放出冰
                 time.sleep(0.3)
                 pcaW21.output(PCA9535J33.pin4,LOW) ###給冰電磁閥開啟###
                 pcaW21.output(PCA9535J33.pin2,LOW) ### 冰塊推桿到B(升起) ### 防卡冰?
-                time.sleep(0.3)
+                time.sleep(0.5)
                 pcaW21.output(PCA9535J33.pin2,HIGH) ### 冰塊推桿到A(下降) ### 防卡冰?
                 pcaW21.output(PCA9535J33.pin4,HIGH) ###給冰電磁閥關閉###
             ##pcaW21.output(PCA9535J33.pin4,HIGH) ###給冰電磁閥關閉###
@@ -590,11 +576,10 @@ def StationA_S0(track,opentimeStr):
         if opentime > 0:
             pcaW21.output(PCA9535J33.pin4,LOW) ###給冰電磁閥開啟###
             for i in range(opentime): #Evan 點放出冰
-                ##time.sleep(0.3)
-                ##pcaW21.output(PCA9535J33.pin4,LOW) ###給冰電磁閥開啟###
-                ##time.sleep(0.3)
+                time.sleep(0.3)
+                pcaW21.output(PCA9535J33.pin4,LOW) ###給冰電磁閥開啟###
                 time.sleep(0.4)
-                ##pcaW21.output(PCA9535J33.pin4,HIGH) ###給冰電磁閥關閉###
+                pcaW21.output(PCA9535J33.pin4,HIGH) ###給冰電磁閥關閉###
             pcaW21.output(PCA9535J33.pin4,HIGH) ###給冰電磁閥關閉###
             time.sleep(3) ## 等待冰塊滑落 ##
         print("S0B道做完囉")
@@ -1337,19 +1322,19 @@ def StationF_S5(track,timedata,iceSec):
     
     if iceSec == "00":
         print('=== 冰塊水量調節00')
-        time4 += 4
+        time4 += 8
     elif iceSec == "01":
         print('=== 冰塊水量調節01')
-        time4 += 3
+        time4 += 7
     elif iceSec == "02":
         print('=== 冰塊水量調節02')
-        time4 += 2
+        time4 += 6
     elif iceSec == "03":
         print('=== 冰塊水量調節03')
         time4 += 2
     elif iceSec == "04":
         print('=== 冰塊水量調節04')
-        time4 += 1
+        time4 += 0
     elif iceSec == "05":
         print('=== 冰塊水量調節05')
         time4 += 0
@@ -1465,6 +1450,8 @@ def StationEnd_S6(track,ordernumber):
     ##    if icount >= 20:
     ##        break
     ##===================================================================
+    pcaW21.output(PCA9535J33.pin2,LOW) ### 冰塊推桿到B道 ###
+    time.sleep(1)
     pcaW21.output(PCA9535J34.pin9,HIGH) ## 爪夾開啟 ##
     if track == "A":
         serA.write(bytes(Track.PositionEnd + "\r\n" , "utf-8"))
