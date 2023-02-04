@@ -131,6 +131,7 @@ iocontrolsleep = 0.5
 CleanTimecount = 0
 CleanMode = 0
 LastCleanMode_Open = 0
+HotWaterClean = 0  ##讓熱水保持熱度每10分鐘清一次
 
 CleanManual=sys.argv[1] ##clean=run, noclean=noclean
 
@@ -160,9 +161,10 @@ def AutoClean(modenum):
     global pcaW2c_Data
     global pcaW28_Data
     global pcaW2a_Data
-    global CleanTimecount
+    global CleanTimecount 
     global CleanMode
     global LastCleanMode_Open
+    global HotWaterClean ##讓熱水保持熱度每10分鐘清一次
 
     CleanTimecount += 1
     ##print(CleanTimecount)
@@ -173,6 +175,9 @@ def AutoClean(modenum):
        CleanTimecount = 2400
     if CleanTimecount == 2400:
        CleanTimecount = 0
+       HotWaterClean = 0
+    elif CleanTimecount%600 == 0: ##讓熱水保持熱度每10分鐘清一次
+       HotWaterClean = 1
     else:
        return False
     
@@ -181,6 +186,7 @@ def AutoClean(modenum):
     f.close()
     if BRunstate != "NoRun":
         CleanTimecount = 0
+        HotWaterClean = 0
         return False
     
     f = open("/home/pi/paypaymachine/sysArunstate.txt", 'w')
@@ -196,150 +202,142 @@ def AutoClean(modenum):
     hour_time = time.strftime("%H", t)
     hour_time_int = int(hour_time)
     print(hour_time)
-    print('== 定時清潔啟動 ==')
-    ## 攪動冰塊 ##
-    print('== 攪動冰塊 ==')
-    pcaW21.output(PCA9535J33.pin2,LOW) ### 冰塊推桿到B ###
-    time.sleep(1)
-    pcaW21.output(PCA9535J33.pin4,LOW) ###給冰電磁閥開啟###
-    time.sleep(1)
-    pcaW21.output(PCA9535J33.pin4,HIGH) ###給冰電磁閥關閉###
-    time.sleep(1)
-    ## 牛奶清潔 A道## 
-    print('== 牛奶清潔 ==')
-    time.sleep(1)
-    pcaW2c_Data=pcaW2c.output(J34.pin7,0,pcaW2c_Data) 
-    time.sleep(0.5)
-    pcaW28_Data=pcaW28.output(J34.pin7,0,pcaW28_Data)
-    time.sleep(8)
-    pcaW28_Data=pcaW28.output(J34.pin7,1,pcaW28_Data)
-    time.sleep(0.5)
-    pcaW2c_Data=pcaW2c.output(J34.pin7,1,pcaW2c_Data)
-    time.sleep(3)
-    ## 牛奶清潔 B道## 
-    pcaW2a_Data=pcaW2a.output(J34.pin7,0,pcaW2a_Data) 
-    time.sleep(0.5)
-    pcaW28_Data=pcaW28.output(J34.pin7,0,pcaW28_Data)
-    time.sleep(4)
-    pcaW28_Data=pcaW28.output(J34.pin7,1,pcaW28_Data)
-    time.sleep(0.5)
-    pcaW2a_Data=pcaW2a.output(J34.pin7,1,pcaW2a_Data)
-    time.sleep(1)
-    ##==============================================
-    if hour_time_int >= 1 and hour_time_int <= 9: ##設定休息沖茶總清時間
-        print('== 時間範圍內不沖茶 ==')        
-        pcaW21.output(PCA9535J33.pin6,LOW) ### 沖茶機No1 CleanMode Enable###
+    if HotWaterClean == 0: ##讓熱水保持熱度每10分鐘清一次
+        print('== 定時清潔啟動 ==')
+        ## 攪動冰塊 ##
+        print('== 攪動冰塊 ==')
+        pcaW21.output(PCA9535J33.pin2,LOW) ### 冰塊推桿到B ###
         time.sleep(1)
-        pcaW21.output(PCA9535J33.pin8,LOW) ### 沖茶機No2 CleanMode Enable###
+        pcaW21.output(PCA9535J33.pin4,LOW) ###給冰電磁閥開啟###
         time.sleep(1)
-        pcaW21.output(PCA9535J33.pin10,LOW) ### 沖茶機No3 CleanMode Enable###
-        CleanMode = 1
-        LastCleanMode_Open = 0
-    else:
-        print('== 正常沖茶 ==') 
-        if CleanMode:
-            print('== 最後清桶準備營運 ==')
-            LastCleanMode_Open = 1
-        else:
+        pcaW21.output(PCA9535J33.pin4,HIGH) ###給冰電磁閥關閉###
+        time.sleep(1)
+        ## 牛奶清潔 A道## 
+        print('== 牛奶清潔 ==')
+        time.sleep(1)
+        pcaW2c_Data=pcaW2c.output(J34.pin7,0,pcaW2c_Data) 
+        time.sleep(0.5)
+        pcaW28_Data=pcaW28.output(J34.pin7,0,pcaW28_Data)
+        time.sleep(8)
+        pcaW28_Data=pcaW28.output(J34.pin7,1,pcaW28_Data)
+        time.sleep(0.5)
+        pcaW2c_Data=pcaW2c.output(J34.pin7,1,pcaW2c_Data)
+        time.sleep(3)
+        ## 牛奶清潔 B道## 
+        pcaW2a_Data=pcaW2a.output(J34.pin7,0,pcaW2a_Data) 
+        time.sleep(0.5)
+        pcaW28_Data=pcaW28.output(J34.pin7,0,pcaW28_Data)
+        time.sleep(4)
+        pcaW28_Data=pcaW28.output(J34.pin7,1,pcaW28_Data)
+        time.sleep(0.5)
+        pcaW2a_Data=pcaW2a.output(J34.pin7,1,pcaW2a_Data)
+        time.sleep(1)
+        ##==============================================
+        if hour_time_int >= 1 and hour_time_int <= 9: ##設定休息沖茶總清時間
+            print('== 時間範圍內不沖茶 ==')        
+            pcaW21.output(PCA9535J33.pin6,LOW) ### 沖茶機No1 CleanMode Enable###
+            time.sleep(1)
+            pcaW21.output(PCA9535J33.pin8,LOW) ### 沖茶機No2 CleanMode Enable###
+            time.sleep(1)
+            pcaW21.output(PCA9535J33.pin10,LOW) ### 沖茶機No3 CleanMode Enable###
+            CleanMode = 1
             LastCleanMode_Open = 0
-        pcaW21.output(PCA9535J33.pin6,HIGH) ### 沖茶機No1 CleanMode Close###
+        else:
+            print('== 正常沖茶 ==') 
+            if CleanMode:
+                print('== 最後清桶準備營運 ==')
+                LastCleanMode_Open = 1
+            else:
+                LastCleanMode_Open = 0
+            pcaW21.output(PCA9535J33.pin6,HIGH) ### 沖茶機No1 CleanMode Close###
+            time.sleep(1)
+            pcaW21.output(PCA9535J33.pin8,HIGH) ### 沖茶機No2 CleanMode Close###
+            time.sleep(1)
+            pcaW21.output(PCA9535J33.pin10,HIGH) ### 沖茶機No3 CleanMode Close###
+            CleanMode = 0
+            if LastCleanMode_Open == 1:
+                while True:
+                    time.sleep(4000)
+                    print('== 最後準備營運等待人員重新啟動 ==')
+        ##==============================================
+        ## 茶液清潔 紅茶 ## AS4-1
+        print('==茶液清潔 紅茶 AS4-1 ==')
+        pcaW2c_Data=pcaW2c.output(J34.pin4,0,pcaW2c_Data)
+        time.sleep(0.5)
+        pcaW28_Data=pcaW28.output(J34.pin4,0,pcaW28_Data)
+        if CleanMode:  ##CleanMode, 清空茶桶
+            print('== 總清排 AS4-1 ==')
+            time.sleep(40)
+        time.sleep(12)
+        pcaW28_Data=pcaW28.output(J34.pin4,1,pcaW28_Data)
+        time.sleep(0.5)
+        pcaW2c_Data=pcaW2c.output(J34.pin4,1,pcaW2c_Data)
         time.sleep(1)
-        pcaW21.output(PCA9535J33.pin8,HIGH) ### 沖茶機No2 CleanMode Close###
+        ## 茶液清潔 紅茶 ## BS4-1
+        pcaW2a_Data=pcaW2a.output(J34.pin4,0,pcaW2a_Data)
+        time.sleep(0.5)
+        pcaW28_Data=pcaW28.output(J34.pin4,0,pcaW28_Data)
+        if CleanMode: ##CleanMode, 清空茶桶
+            print('== 總清排 BS4-1 ==')
+            time.sleep(40)
+        time.sleep(4)
+        pcaW28_Data=pcaW28.output(J34.pin4,1,pcaW28_Data)
+        time.sleep(0.5)
+        pcaW2a_Data=pcaW2a.output(J34.pin4,1,pcaW2a_Data)
         time.sleep(1)
-        pcaW21.output(PCA9535J33.pin10,HIGH) ### 沖茶機No3 CleanMode Close###
-        CleanMode = 0
-        if LastCleanMode_Open == 1:
-            while True:
-                time.sleep(2000)
-                print('== 最後準備營運等待人員重新啟動 ==')
-        ##print('== 時間範圍內不清茶 ==')
-        ##f = open("/home/pi/paypaymachine/sysArunstate.txt", 'w')
-        ##f.write('NoRun')
-        ##f.close()
-        ##f = open("/home/pi/paypaymachine/sysBrunstate.txt", 'w')
-        ##f.write('NoRun')
-        ##f.close()
-        ##print('== 定時清潔結束 ==')
-        ##return True
-       
-    ##==============================================
-    ## 茶液清潔 紅茶 ## AS4-1
-    print('==茶液清潔 紅茶 AS4-1 ==')
-    pcaW2c_Data=pcaW2c.output(J34.pin4,0,pcaW2c_Data)
-    time.sleep(0.5)
-    pcaW28_Data=pcaW28.output(J34.pin4,0,pcaW28_Data)
-    if CleanMode:  ##CleanMode, 清空茶桶
-        print('== 總清排 AS4-1 ==')
-        time.sleep(40)
-    time.sleep(12)
-    pcaW28_Data=pcaW28.output(J34.pin4,1,pcaW28_Data)
-    time.sleep(0.5)
-    pcaW2c_Data=pcaW2c.output(J34.pin4,1,pcaW2c_Data)
-    time.sleep(1)
-    ## 茶液清潔 紅茶 ## BS4-1
-    pcaW2a_Data=pcaW2a.output(J34.pin4,0,pcaW2a_Data)
-    time.sleep(0.5)
-    pcaW28_Data=pcaW28.output(J34.pin4,0,pcaW28_Data)
-    if CleanMode: ##CleanMode, 清空茶桶
-        print('== 總清排 BS4-1 ==')
-        time.sleep(40)
-    time.sleep(4)
-    pcaW28_Data=pcaW28.output(J34.pin4,1,pcaW28_Data)
-    time.sleep(0.5)
-    pcaW2a_Data=pcaW2a.output(J34.pin4,1,pcaW2a_Data)
-    time.sleep(1)
-    ##===============================================
-    ## 茶液清潔 青茶 ## AS4-4
-    print('==茶液清潔 青茶 AS4-4 ==')
-    pcaW2c_Data=pcaW2c.output(J34.pin2,0,pcaW2c_Data)
-    time.sleep(0.5)
-    pcaW28_Data=pcaW28.output(J34.pin2,0,pcaW28_Data)
-    if CleanMode: ##CleanMode, 清空茶桶
-        print('== 總清排 AS4-4 ==')
-        time.sleep(40)
-    time.sleep(10)
-    pcaW28_Data=pcaW28.output(J34.pin2,1,pcaW28_Data)
-    time.sleep(0.5)
-    pcaW2c_Data=pcaW2c.output(J34.pin2,1,pcaW2c_Data)
-    time.sleep(1)
-    ## 茶液清潔 青茶 ## BS4-4
-    pcaW2a_Data=pcaW2a.output(J34.pin2,0,pcaW2a_Data)
-    time.sleep(0.5)
-    pcaW28_Data=pcaW28.output(J34.pin2,0,pcaW28_Data)
-    if CleanMode: ##CleanMode, 清空茶桶
-        print('== 總清排 BS4-4 ==')
-        time.sleep(40)
-    time.sleep(4)
-    pcaW28_Data=pcaW28.output(J34.pin2,1,pcaW28_Data)
-    time.sleep(0.5)
-    pcaW2a_Data=pcaW2a.output(J34.pin2,1,pcaW2a_Data)
-    ##===============================================
-    ## 茶液清潔 特殊茶 ## AS5-3
-    print('==茶液清潔 特殊茶 AS5-3 ==')
-    pcaW2c_Data=pcaW2c.output(J34.pin6,0,pcaW2c_Data)
-    time.sleep(0.5)
-    pcaW28_Data=pcaW28.output(J34.pin6,0,pcaW28_Data)
-    if CleanMode: ##CleanMode, 清空茶桶
-        print('== 總清排 AS5-3 ==')
-        time.sleep(40)
-    pcaW28_Data=pcaW28.output(J34.pin6,1,pcaW28_Data)
-    time.sleep(0.5)
-    pcaW2c_Data=pcaW2c.output(J34.pin6,1,pcaW2c_Data)
-    time.sleep(1)
-    ## 茶液清潔 特殊茶 ## BS5-3
-    pcaW2a_Data=pcaW2a.output(J34.pin6,0,pcaW2a_Data)
-    time.sleep(0.5)
-    pcaW28_Data=pcaW28.output(J34.pin6,0,pcaW28_Data)
-    if CleanMode: ##CleanMode, 清空茶桶
-        print('== 總清排 BS5-3 ==')
-        time.sleep(40)
-    time.sleep(4)
-    pcaW28_Data=pcaW28.output(J34.pin6,1,pcaW28_Data)
-    time.sleep(0.5)
-    pcaW2a_Data=pcaW2a.output(J34.pin6,1,pcaW2a_Data)
+        ##===============================================
+        ## 茶液清潔 青茶 ## AS4-4
+        print('==茶液清潔 青茶 AS4-4 ==')
+        pcaW2c_Data=pcaW2c.output(J34.pin2,0,pcaW2c_Data)
+        time.sleep(0.5)
+        pcaW28_Data=pcaW28.output(J34.pin2,0,pcaW28_Data)
+        if CleanMode: ##CleanMode, 清空茶桶
+            print('== 總清排 AS4-4 ==')
+            time.sleep(40)
+        time.sleep(10)
+        pcaW28_Data=pcaW28.output(J34.pin2,1,pcaW28_Data)
+        time.sleep(0.5)
+        pcaW2c_Data=pcaW2c.output(J34.pin2,1,pcaW2c_Data)
+        time.sleep(1)
+        ## 茶液清潔 青茶 ## BS4-4
+        pcaW2a_Data=pcaW2a.output(J34.pin2,0,pcaW2a_Data)
+        time.sleep(0.5)
+        pcaW28_Data=pcaW28.output(J34.pin2,0,pcaW28_Data)
+        if CleanMode: ##CleanMode, 清空茶桶
+            print('== 總清排 BS4-4 ==')
+            time.sleep(40)
+        time.sleep(4)
+        pcaW28_Data=pcaW28.output(J34.pin2,1,pcaW28_Data)
+        time.sleep(0.5)
+        pcaW2a_Data=pcaW2a.output(J34.pin2,1,pcaW2a_Data)
+        ##===============================================
+        ## 茶液清潔 特殊茶 ## AS5-3
+        print('==茶液清潔 特殊茶 AS5-3 ==')
+        pcaW2c_Data=pcaW2c.output(J34.pin6,0,pcaW2c_Data)
+        time.sleep(0.5)
+        pcaW28_Data=pcaW28.output(J34.pin6,0,pcaW28_Data)
+        if CleanMode: ##CleanMode, 清空茶桶
+            print('== 總清排 AS5-3 ==')
+            time.sleep(40)
+        time.sleep(10)
+        pcaW28_Data=pcaW28.output(J34.pin6,1,pcaW28_Data)
+        time.sleep(0.5)
+        pcaW2c_Data=pcaW2c.output(J34.pin6,1,pcaW2c_Data)
+        time.sleep(1)
+        ## 茶液清潔 特殊茶 ## BS5-3
+        pcaW2a_Data=pcaW2a.output(J34.pin6,0,pcaW2a_Data)
+        time.sleep(0.5)
+        pcaW28_Data=pcaW28.output(J34.pin6,0,pcaW28_Data)
+        if CleanMode: ##CleanMode, 清空茶桶
+            print('== 總清排 BS5-3 ==')
+            time.sleep(40)
+        time.sleep(4)
+        pcaW28_Data=pcaW28.output(J34.pin6,1,pcaW28_Data)
+        time.sleep(0.5)
+        pcaW2a_Data=pcaW2a.output(J34.pin6,1,pcaW2a_Data)
     ##===============================================
     ## 純淨水 ## AS5-4
-    print('==茶液清潔 純淨水 AS5-4 ==')
+    print('== 純淨水 AS5-4 ==')
     pcaW2c_Data=pcaW2c.output(J33.pin8,0,pcaW2c_Data)
     time.sleep(0.5)
     pcaW28_Data=pcaW28.output(J33.pin8,0,pcaW28_Data)
@@ -369,6 +367,7 @@ def AutoClean(modenum):
     f.write('NoRun')
     f.close()
     print('== 定時清潔結束 ==')
+    HotWaterClean = 0
     time.sleep(2) ## A道多等一些時間
     ##f = open("/home/pi/paypaymachine/sysBrunstate.txt", 'w')
     ##f.write('NoRun')

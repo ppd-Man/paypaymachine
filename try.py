@@ -503,9 +503,9 @@ def main():
             time.sleep(iocontrolsleep)
             pcaW2a_Data=doorB.output(J17.pin8,0,pcaW2a_Data)
             time.sleep(iocontrolsleep)
-            pcaW28_Data=pump1.output(J17.pin8,0,pcaW28_Data)
+            pcaW28_Data=pump.output(J17.pin8,0,pcaW28_Data)
             time.sleep(time3)
-            pcaW28_Data=pump1.output(J17.pin8,1,pcaW28_Data)
+            pcaW28_Data=pump.output(J17.pin8,1,pcaW28_Data)
             time.sleep(iocontrolsleep)
             pcaW2a_Data=doorB.output(J17.pin8,1,pcaW2a_Data)
         if time4 !=0 :
